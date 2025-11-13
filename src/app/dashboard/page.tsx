@@ -14,6 +14,12 @@ const games = [
     image: "https://cdn-icons-png.flaticon.com/512/616/616490.png",
     route: "/tic-tac-toe",
   },
+  {
+    name: "Memory Game",
+    description: "Test your memory skills solo or with a friend. Flip cards and find all pairs!",
+    image: "https://cdn-icons-png.flaticon.com/512/616/616554.png",
+    route: "/memory-game",
+  },
   // Add more games here
 ];
 
