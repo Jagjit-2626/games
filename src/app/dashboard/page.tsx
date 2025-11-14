@@ -3,6 +3,18 @@ import { useRouter } from "next/navigation";
 
 const games = [
 	{
+		name: "2048",
+		description: "Slide and combine tiles to reach 2048!",
+		image: "https://cdn-icons-png.flaticon.com/512/1040/1040231.png",
+		route: "/2048/play",
+	},
+	{
+		name: "Sudoku",
+		description: "Fill the grid so every row, column, and box contains 1-9!",
+		image: "https://cdn-icons-png.flaticon.com/512/1040/1040232.png",
+		route: "/sudoku/play",
+	},
+	{
 		name: "Snake",
 		description: "Classic snake game with modern UI.",
 		image: "https://cdn-icons-png.flaticon.com/512/616/616554.png", // reliable snake icon
@@ -21,18 +33,6 @@ const games = [
 		image:
 			"https://cdn-icons-png.flaticon.com/512/1055/1055687.png", // updated to a memory/brain icon
 		route: "/memory-game",
-	},
-	{
-		name: "2048",
-		description: "Slide and combine tiles to reach 2048!",
-		image: "https://cdn-icons-png.flaticon.com/512/1040/1040231.png",
-		route: "/2048/play",
-	},
-	{
-		name: "Sudoku",
-		description: "Fill the grid so every row, column, and box contains 1-9!",
-		image: "https://cdn-icons-png.flaticon.com/512/1040/1040232.png",
-		route: "/sudoku/play",
 	},
 	// Add more games here
 ];
