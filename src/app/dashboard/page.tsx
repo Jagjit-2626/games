@@ -28,6 +28,12 @@ const games = [
 		image: "https://cdn-icons-png.flaticon.com/512/1040/1040231.png",
 		route: "/2048/play",
 	},
+	{
+		name: "Sudoku",
+		description: "Fill the grid so every row, column, and box contains 1-9!",
+		image: "https://cdn-icons-png.flaticon.com/512/1040/1040232.png",
+		route: "/sudoku/play",
+	},
 	// Add more games here
 ];
 
