@@ -125,7 +125,7 @@ export default function SnakeGame() {
         className="absolute top-6 right-6 px-6 py-3 bg-blue-500 text-white rounded shadow hover:bg-blue-600 text-lg font-bold transition z-20"
         onClick={() => router && router.push('/dashboard')}
       >
-        Go to Games
+        Back to Games
       </button>
       {/* Difficulty options: right side, further down below Go to Games button */}
       <div className="absolute" style={{top: '180px', right: '64px'}}>

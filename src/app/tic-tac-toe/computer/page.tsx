@@ -85,14 +85,13 @@ export default function TicTacToeComputer() {
 }
 
 function getAIMove(board: string[], difficulty: 'easy' | 'medium' | 'hard') {
-  // Easy: pick first available
+  // Easy: pick random available
   if (difficulty === 'easy') {
-    for (let i = 0; i < board.length; i++) {
-      if (!board[i]) return i;
-    }
-    return null;
+    const available = board.map((cell, i) => cell ? null : i).filter(i => i !== null) as number[];
+    if (available.length === 0) return null;
+    return available[Math.floor(Math.random() * available.length)];
   }
-  // Medium: block player win
+  // Medium: block player win, else pick random
   if (difficulty === 'medium') {
     // Block if player can win next
     for (let i = 0; i < board.length; i++) {
@@ -102,11 +101,10 @@ function getAIMove(board: string[], difficulty: 'easy' | 'medium' | 'hard') {
         if (checkWinner(copy) === 'X') return i;
       }
     }
-    // Otherwise pick first
-    for (let i = 0; i < board.length; i++) {
-      if (!board[i]) return i;
-    }
-    return null;
+    // Otherwise pick random
+    const available = board.map((cell, i) => cell ? null : i).filter(i => i !== null) as number[];
+    if (available.length === 0) return null;
+    return available[Math.floor(Math.random() * available.length)];
   }
   // Hard: use minimax for optimal move
   if (difficulty === 'hard') {
