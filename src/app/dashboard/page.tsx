@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 const games = [
 	{
 		name: "Sliding Puzzle",
-		description: "Arrange the tiles to complete a new random picture every time!",
+		description: "Choose picture or numbers mode for the sliding puzzle!",
 		image: "https://cdn-icons-png.flaticon.com/512/1040/1040252.png", // puzzle icon
-		route: "/sliding-puzzle",
+		route: "/sliding-puzzle/select-mode",
 	},
 	{
 		name: "2048",
