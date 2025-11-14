@@ -101,6 +101,28 @@ function hasMoves(board: number[][]) {
   return false;
 }
 
+function getTextColor(value: number) {
+  if (value === 0) return "text-gray-200";
+  return "text-gray-900"; // dark gray/black for all numbers
+}
+
+function getTileBgColor(value: number) {
+  switch (value) {
+    case 2: return "bg-gray-100"; // light neutral
+    case 4: return "bg-blue-100"; // light blue
+    case 8: return "bg-cyan-200"; // cyan
+    case 16: return "bg-indigo-200"; // indigo (was green)
+    case 32: return "bg-fuchsia-200"; // fuchsia (was lime)
+    case 64: return "bg-blue-400"; // vivid blue
+    case 128: return "bg-teal-400"; // teal
+    case 256: return "bg-emerald-400"; // emerald
+    case 512: return "bg-purple-400"; // purple
+    case 1024: return "bg-pink-400"; // pink
+    case 2048: return "bg-red-400"; // red
+    default: return value === 0 ? "bg-gray-200" : "bg-neutral-500";
+  }
+}
+
 export default function Game2048() {
   const [board, setBoard] = useState<number[][] | null>(null);
   const [score, setScore] = useState(0);
@@ -177,7 +199,7 @@ export default function Game2048() {
             row.map((cell, j) => (
               <div
                 key={`${i}-${j}`}
-                className={`flex items-center justify-center text-2xl font-bold rounded-lg transition-all duration-200 w-full h-full aspect-square ${cell === 0 ? 'bg-gray-200 text-gray-200' : 'bg-yellow-300 text-yellow-900'}`}
+                className={`flex items-center justify-center text-2xl font-bold rounded-lg transition-all duration-200 w-full h-full aspect-square ${getTileBgColor(cell)} ${cell === 0 ? 'text-gray-200' : getTextColor(cell)}`}
               >
                 {cell !== 0 ? cell : ''}
               </div>
