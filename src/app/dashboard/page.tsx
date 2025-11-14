@@ -22,6 +22,12 @@ const games = [
 			"https://cdn-icons-png.flaticon.com/512/1055/1055687.png", // updated to a memory/brain icon
 		route: "/memory-game",
 	},
+	{
+		name: "2048",
+		description: "Slide and combine tiles to reach 2048!",
+		image: "https://cdn-icons-png.flaticon.com/512/1040/1040231.png",
+		route: "/2048/play",
+	},
 	// Add more games here
 ];
 
