@@ -41,9 +41,12 @@ export default function Dashboard() {
 	const router = useRouter();
 	return (
 		<div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-200 to-green-200 pt-12">
-			<h1 className="text-5xl font-bold mb-10 text-blue-700 drop-shadow-lg">
-				Games
+			<h1 className="text-5xl font-bold mb-2 text-blue-700 drop-shadow-lg">
+				Welcome Aboard
 			</h1>
+			<div className="text-xl font-medium mb-8 text-blue-600 text-center">
+				Your personal game arena
+			</div>
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full max-w-4xl px-4">
 				{games.map((game) => (
 					<div
