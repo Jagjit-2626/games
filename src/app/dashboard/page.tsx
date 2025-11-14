@@ -34,13 +34,19 @@ const games = [
 			"https://cdn-icons-png.flaticon.com/512/1055/1055687.png", // updated to a memory/brain icon
 		route: "/memory-game",
 	},
+	{
+		name: "Sliding Puzzle",
+		description: "Arrange the tiles to complete a new random picture every time!",
+		image: "https://cdn-icons-png.flaticon.com/512/1040/1040252.png", // puzzle icon
+		route: "/sliding-puzzle",
+	},
 	// Add more games here
 ];
 
 export default function Dashboard() {
 	const router = useRouter();
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-200 to-green-200 pt-12">
+		<div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-200 to-green-200 pt-12 pb-12">
 			<h1 className="text-5xl font-bold mb-2 text-blue-700 drop-shadow-lg">
 				Welcome Aboard
 			</h1>
