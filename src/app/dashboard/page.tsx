@@ -34,7 +34,7 @@ const games = [
 export default function Dashboard() {
 	const router = useRouter();
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-200 to-green-200">
+		<div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-200 to-green-200 pt-12">
 			<h1 className="text-5xl font-bold mb-10 text-blue-700 drop-shadow-lg">
 				Games
 			</h1>
