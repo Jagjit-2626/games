@@ -5,45 +5,44 @@ const games = [
 	{
 		name: "Sliding Puzzle",
 		description: "Choose picture or numbers mode for the sliding puzzle!",
-		image: "https://cdn-icons-png.flaticon.com/512/1040/1040252.png", // puzzle icon
+		image: "emoji", // use emoji instead of image URL
 		route: "/sliding-puzzle/select-mode",
 	},
 	{
 		name: "2048",
 		description: "Slide and combine tiles to reach 2048!",
-		image: "https://cdn-icons-png.flaticon.com/512/1040/1040231.png",
+		image: "emoji", // use emoji instead of image URL
 		route: "/2048/play",
 	},
 	{
 		name: "Sudoku",
 		description: "Fill the grid so every row, column, and box contains 1-9!",
-		image: "https://cdn-icons-png.flaticon.com/512/1040/1040232.png",
+		image: "emoji", // use emoji instead of image URL
 		route: "/sudoku/play",
 	},
 	{
 		name: "Snake",
 		description: "Classic snake game with modern UI.",
-		image: "https://cdn-icons-png.flaticon.com/512/616/616554.png", // reliable snake icon
+		image: "emoji", // use emoji instead of image URL
 		route: "/snake-game",
 	},
 	{
 		name: "Tic Tac Toe",
 		description: "Play Tic Tac Toe against a friend.",
-		image: "https://cdn-icons-png.flaticon.com/512/616/616490.png",
+		image: "emoji", // use emoji instead of image URL
 		route: "/tic-tac-toe",
 	},
 	{
 		name: "Memory Game",
 		description:
 			"Test your memory skills solo or with a friend. Flip cards and find all pairs!",
-		image:
-			"https://cdn-icons-png.flaticon.com/512/1055/1055687.png", // updated to a memory/brain icon
+		image: "emoji", // use emoji instead of image URL
 		route: "/memory-game",
 	},
 	{
 		name: "Simon Says",
 		description: "Repeat the color sequence. Test your memory!",
-		image: "https://cdn-icons-png.flaticon.com/512/1040/1040269.png", // simon says icon
+		image: "emoji", // use emoji instead of image URL
 		route: "/simon-says",
 	},
 	// Add more games here
@@ -66,11 +65,61 @@ export default function Dashboard() {
 						className="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center hover:scale-105 transition cursor-pointer h-80"
 						onClick={() => router.push(game.route)}
 					>
-						<img
-							src={game.image}
-							alt={game.name}
-							className="w-20 h-20 mb-4"
-						/>
+						{game.name === "Snake" ? (
+							<span
+								className="text-6xl mb-4"
+								role="img"
+								aria-label="snake"
+							>
+								🐍
+							</span>
+						) : game.name === "Tic Tac Toe" ? (
+							<span
+								className="text-6xl mb-4"
+								role="img"
+								aria-label="tic tac toe"
+							>
+								❌⭕
+							</span>
+						) : game.name === "Memory Game" ? (
+							<span
+								className="text-6xl mb-4"
+								role="img"
+								aria-label="memory"
+							>
+								🧠
+							</span>
+						) : game.name === "Sliding Puzzle" ? (
+							<span
+								className="text-6xl mb-4"
+								role="img"
+								aria-label="sliding puzzle"
+							>
+								🧩
+							</span>
+						) : game.name === "2048" ? (
+							<span className="text-6xl mb-4" role="img" aria-label="2048">
+								🔢
+							</span>
+						) : game.name === "Sudoku" ? (
+							<span className="text-6xl mb-4" role="img" aria-label="sudoku">
+								🧮
+							</span>
+						) : game.name === "Simon Says" ? (
+							<span
+								className="text-6xl mb-4"
+								role="img"
+								aria-label="simon says"
+							>
+								🟦
+							</span>
+						) : (
+							<img
+								src={game.image}
+								alt={game.name}
+								className="w-20 h-20 mb-4"
+							/>
+						)}
 						<h2 className="text-2xl font-semibold mb-2 text-green-700">
 							{game.name}
 						</h2>
