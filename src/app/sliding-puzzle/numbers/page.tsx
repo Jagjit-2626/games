@@ -24,6 +24,15 @@ function isSolvable(tiles: number[]) {
 export default function SlidingPuzzleNumbers() {
   const [tiles, setTiles] = useState<number[]>([]);
   const [won, setWon] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+  const [timerStarted, setTimerStarted] = useState(false);
+  useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
+    if (timerStarted && !won) {
+      timer = setInterval(() => setSeconds((s) => s + 1), 1000);
+    }
+    return () => timer && clearInterval(timer);
+  }, [timerStarted, won]);
   function startNewGame() {
     let shuffled = getShuffledTiles();
     while (!isSolvable(shuffled) || isSolved(shuffled)) {
@@ -31,6 +40,8 @@ export default function SlidingPuzzleNumbers() {
     }
     setTiles(shuffled);
     setWon(false);
+    setSeconds(0);
+    setTimerStarted(false);
   }
   useEffect(() => { startNewGame(); }, []);
   function isSolved(arr: number[]) {
@@ -38,6 +49,7 @@ export default function SlidingPuzzleNumbers() {
   }
   function moveTile(idx: number) {
     if (won) return;
+    if (!timerStarted) setTimerStarted(true);
     const empty = tiles.indexOf(0);
     const canMove = [
       empty - 1 === idx && empty % SIZE !== 0,
@@ -56,6 +68,9 @@ export default function SlidingPuzzleNumbers() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-200">
       <button className="absolute top-6 right-6 px-6 py-3 bg-gray-400 text-white rounded shadow hover:bg-gray-500 text-lg font-bold transition z-20" onClick={() => window.location.href = '/sliding-puzzle/select-mode'}>Back to Selection</button>
+      <div className="absolute top-20 right-6 z-20 w-48 flex justify-center">
+        <div className="bg-white/80 rounded-lg px-4 py-2 shadow text-blue-700 font-bold text-lg">Timer: {seconds}s</div>
+      </div>
       <h1 className="text-4xl font-bold mb-4 text-blue-700 drop-shadow-lg">Sliding Puzzle - Numbers</h1>
       <div className="grid grid-cols-4 gap-1 bg-white rounded-xl p-2 shadow-lg mb-6 w-full max-w-xs aspect-square relative">
         {tiles.map((tile, idx) => (
