@@ -40,6 +40,12 @@ const games = [
 			"https://cdn-icons-png.flaticon.com/512/1055/1055687.png", // updated to a memory/brain icon
 		route: "/memory-game",
 	},
+	{
+		name: "Simon Says",
+		description: "Repeat the color sequence. Test your memory!",
+		image: "https://cdn-icons-png.flaticon.com/512/1040/1040269.png", // simon says icon
+		route: "/simon-says",
+	},
 	// Add more games here
 ];
 
