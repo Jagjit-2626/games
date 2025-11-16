@@ -3,6 +3,12 @@ import { useRouter } from "next/navigation";
 
 const games = [
 	{
+		name: "Chess",
+		description: "Classic chess with full rules and a modern UI!",
+		image: "emoji",
+		route: "/chess",
+	},
+	{
 		name: "Sliding Puzzle",
 		description: "Choose picture or numbers mode for the sliding puzzle!",
 		image: "emoji", // use emoji instead of image URL
@@ -130,6 +136,14 @@ export default function Dashboard() {
 								aria-label="minesweeper"
 							>
 								💣
+							</span>
+						) : game.name === "Chess" ? (
+							<span
+								className="text-6xl mb-4 text-black"
+								role="img"
+								aria-label="chess"
+							>
+								♔♛
 							</span>
 						) : (
 							<img
