@@ -39,6 +39,12 @@ const games = [
 		image: "emoji", // use emoji instead of image URL
 		route: "/simon-says",
 	},
+	{
+		name: "Connect Four",
+		description: "Drop discs to connect four in a row before your opponent!",
+		image: "emoji",
+		route: "/connect-four",
+	},
 	// Add more games here
 ];
 
@@ -102,6 +108,14 @@ export default function Dashboard() {
 								aria-label="simon says"
 							>
 								🟦
+							</span>
+						) : game.name === "Connect Four" ? (
+							<span
+								className="text-6xl mb-4"
+								role="img"
+								aria-label="connect four"
+							>
+								🟡🔴
 							</span>
 						) : (
 							<img
