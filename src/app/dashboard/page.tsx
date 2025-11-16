@@ -15,12 +15,6 @@ const games = [
 		route: "/2048/play",
 	},
 	{
-		name: "Sudoku",
-		description: "Fill the grid so every row, column, and box contains 1-9!",
-		image: "emoji", // use emoji instead of image URL
-		route: "/sudoku/play",
-	},
-	{
 		name: "Snake",
 		description: "Classic snake game with modern UI.",
 		image: "emoji", // use emoji instead of image URL
@@ -100,10 +94,6 @@ export default function Dashboard() {
 						) : game.name === "2048" ? (
 							<span className="text-6xl mb-4" role="img" aria-label="2048">
 								🔢
-							</span>
-						) : game.name === "Sudoku" ? (
-							<span className="text-6xl mb-4" role="img" aria-label="sudoku">
-								🧮
 							</span>
 						) : game.name === "Simon Says" ? (
 							<span

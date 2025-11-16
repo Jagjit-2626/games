@@ -47,9 +47,10 @@ export default function SnakeGame() {
     if (!started || gameOver || food === null) return;
     const interval = setInterval(() => {
       setSnake((prev) => {
+        const dir = moveRef.current; // Use the latest direction
         const newHead = {
-          x: prev[0].x + direction.x,
-          y: prev[0].y + direction.y,
+          x: prev[0].x + dir.x,
+          y: prev[0].y + dir.y,
         };
         // Check collision
         if (
@@ -73,7 +74,7 @@ export default function SnakeGame() {
       });
     }, speedMap[difficulty]);
     return () => clearInterval(interval);
-  }, [direction, food, gameOver, started, difficulty]);
+  }, [food, gameOver, started, difficulty]);
 
   useEffect(() => {
     if (!started || gameOver) return;
@@ -96,6 +97,16 @@ export default function SnakeGame() {
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [gameOver, started]);
+
+  useEffect(() => {
+    const handleEnterRestart = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && gameOver) {
+        handleStart();
+      }
+    };
+    window.addEventListener("keydown", handleEnterRestart);
+    return () => window.removeEventListener("keydown", handleEnterRestart);
+  }, [gameOver]);
 
   const handleStart = () => {
     setStarted(true);
