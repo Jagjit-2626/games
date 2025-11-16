@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 
 const ROWS = 6;
 const COLS = 7;
@@ -30,58 +30,21 @@ export default function ConnectFour() {
   const [board, setBoard] = useState(() => Array.from({ length: ROWS }, () => Array(COLS).fill(EMPTY)));
   const [current, setCurrent] = useState(PLAYER1);
   const [winner, setWinner] = useState<number | null>(null);
-  const [animating, setAnimating] = useState<{ col: number; row: number; color: number; target: number } | null>(null);
-  const animationRef = useRef<number | null>(null);
 
   function drop(col: number) {
-    if (winner || animating) return;
-    let targetRow = -1;
+    if (winner) return;
     for (let row = ROWS - 1; row >= 0; row--) {
       if (board[row][col] === EMPTY) {
-        targetRow = row;
-        break;
+        const newBoard = board.map((r) => r.slice());
+        newBoard[row][col] = current;
+        setBoard(newBoard);
+        const win = checkWinner(newBoard);
+        if (win) setWinner(win);
+        else setCurrent(current === PLAYER1 ? PLAYER2 : PLAYER1);
+        return;
       }
     }
-    if (targetRow === -1) return;
-    setAnimating({ col, row: 0, color: current, target: targetRow });
   }
-
-  // Animate the falling disc
-  React.useEffect(() => {
-    if (!animating) return;
-    if (animating.row < animating.target) {
-      animationRef.current = window.setTimeout(() => {
-        setAnimating((a) => a && { ...a, row: a.row + 1 });
-      }, 40);
-    } else {
-      // Place the disc in the board
-      setBoard((prev) => {
-        const newBoard = prev.map((r) => r.slice());
-        newBoard[animating.target][animating.col] = animating.color;
-        return newBoard;
-      });
-      setAnimating(null);
-      setTimeout(() => {
-        setWinner((prevWinner) => {
-          const win = checkWinner(
-            board.map((r, i) =>
-              i === animating.target
-                ? r.map((cell, j) =>
-                    j === animating.col ? animating.color : cell
-                  )
-                : r
-            )
-          );
-          if (win) return win;
-          setCurrent((c) => (c === PLAYER1 ? PLAYER2 : PLAYER1));
-          return prevWinner;
-        });
-      }, 10);
-    }
-    return () => {
-      if (animationRef.current) clearTimeout(animationRef.current);
-    };
-  }, [animating]);
 
   function handleRestart() {
     setBoard(Array.from({ length: ROWS }, () => Array(COLS).fill(EMPTY)));
@@ -101,27 +64,14 @@ export default function ConnectFour() {
       <div className="mb-4 text-lg font-semibold text-gray-700">
         {winner ? `Player ${winner} wins!` : `Player ${current}'s turn`}
       </div>
-      <div className="grid grid-cols-7 gap-2 bg-blue-700 p-3 rounded-xl shadow-lg" style={{ maxWidth: 420, maxHeight: 370, position: 'relative' }}>
-        {/* Animated disc */}
-        {animating && (
-          <div
-            className={`w-8 h-8 rounded-full border-2 border-blue-900 z-20 ${animating.color === PLAYER1 ? "bg-red-500" : "bg-yellow-300"}`}
-            style={{
-              position: 'absolute',
-              left: `calc(${animating.col * 10 + animating.col * 2}px + 8px)`,
-              top: `calc(${animating.row * 10 + animating.row * 2}px + 8px)`,
-              transition: 'top 0.04s linear',
-              pointerEvents: 'none',
-            }}
-          />
-        )}
+      <div className="grid grid-cols-7 gap-2 bg-blue-700 p-3 rounded-xl shadow-lg" style={{ maxWidth: 420, maxHeight: 370 }}>
         {board.map((row, rIdx) =>
           row.map((cell, cIdx) => (
             <div
               key={`${rIdx}-${cIdx}`}
               className="w-10 h-10 flex items-center justify-center"
-              onClick={() => !winner && !animating && board[0][cIdx] === EMPTY ? drop(cIdx) : undefined}
-              style={{ cursor: !winner && !animating && board[0][cIdx] === EMPTY ? "pointer" : "default" }}
+              onClick={() => !winner && board[0][cIdx] === EMPTY ? drop(cIdx) : undefined}
+              style={{ cursor: !winner && board[0][cIdx] === EMPTY ? "pointer" : "default" }}
             >
               <div className={`w-8 h-8 rounded-full border-2 border-blue-900 ${cell === EMPTY ? "bg-white" : cell === PLAYER1 ? "bg-red-500" : "bg-yellow-300"}`}></div>
             </div>
