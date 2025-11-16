@@ -45,6 +45,12 @@ const games = [
 		image: "emoji",
 		route: "/connect-four",
 	},
+	{
+		name: "Minesweeper",
+		description: "Reveal all safe cells and avoid the mines! Flag suspected bombs.",
+		image: "emoji",
+		route: "/minesweeper",
+	},
 	// Add more games here
 ];
 
@@ -116,6 +122,14 @@ export default function Dashboard() {
 								aria-label="connect four"
 							>
 								🟡🔴
+							</span>
+						) : game.name === "Minesweeper" ? (
+							<span
+								className="text-6xl mb-4"
+								role="img"
+								aria-label="minesweeper"
+							>
+								💣
 							</span>
 						) : (
 							<img
