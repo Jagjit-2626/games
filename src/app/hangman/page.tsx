@@ -67,6 +67,13 @@ export default function Hangman() {
     fetchWordAndClueWithRetry(setWord, setClue);
   }, []);
 
+  // Check for win after guessed updates
+  useEffect(() => {
+    if (!word) return;
+    const allGuessed = word.split("").every((l) => guessed.includes(l));
+    if (allGuessed && status === "playing") setStatus("won");
+  }, [guessed, word, status]);
+
   function guess(letter: string) {
     if (status !== "playing" || guessed.includes(letter)) return;
     setGuessed((g) => [...g, letter]);
@@ -76,9 +83,6 @@ export default function Hangman() {
         if (newWrong >= MAX_WRONG) setStatus("lost");
         return newWrong;
       });
-    } else {
-      const allGuessed = word.split("").every((l) => guessed.includes(l) || l === letter);
-      if (allGuessed) setStatus("won");
     }
   }
 
