@@ -105,7 +105,7 @@ export default function Hangman() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-yellow-100 pt-12 relative">
       <Link href="/dashboard">
-        <button className="absolute top-6 right-8 px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 font-semibold z-10">
+        <button className="absolute top-6 right-8 px-6 py-3 bg-blue-500 text-white rounded shadow hover:bg-blue-600 text-lg font-bold transition z-10">
           Back to games
         </button>
       </Link>
