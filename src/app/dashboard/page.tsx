@@ -57,6 +57,12 @@ const games = [
 		image: "emoji",
 		route: "/minesweeper",
 	},
+	{
+		name: "Hangman",
+		description: "Guess the word, one letter at a time. Can you save the stick figure?",
+		image: "emoji",
+		route: "/hangman",
+	},
 	// Add more games here
 ];
 
@@ -144,6 +150,14 @@ export default function Dashboard() {
 								aria-label="chess"
 							>
 								♔♛
+							</span>
+						) : game.name === "Hangman" ? (
+							<span
+								className="text-6xl mb-4"
+								role="img"
+								aria-label="hangman"
+							>
+								🪢
 							</span>
 						) : (
 							<img
