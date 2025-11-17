@@ -69,6 +69,7 @@ const games = [
 		image: "emoji",
 		route: "/tetris",
 	},
+	// Wordle card removed
 	// Add more games here
 ];
 
