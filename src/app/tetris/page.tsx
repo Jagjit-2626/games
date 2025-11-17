@@ -218,7 +218,7 @@ export default function Tetris() {
       return (
         <div
           key={`${r}-${c}`}
-          className={`w-[${BLOCK_SIZE}px] h-[${BLOCK_SIZE}px] border border-blue-100 ${COLORS[val]} rounded-sm`}
+          className={`w-[${BLOCK_SIZE}px] h-[${BLOCK_SIZE}px] ${COLORS[val]} rounded-sm ${val !== 0 ? 'border border-black/30' : 'border border-blue-100'}`}
         />
       );
     })
