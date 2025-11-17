@@ -63,6 +63,12 @@ const games = [
 		image: "emoji",
 		route: "/hangman",
 	},
+	{
+		name: "Tetris",
+		description: "Stack falling blocks and clear lines in this classic puzzle game!",
+		image: "emoji",
+		route: "/tetris",
+	},
 	// Add more games here
 ];
 
@@ -125,7 +131,7 @@ export default function Dashboard() {
 								role="img"
 								aria-label="simon says"
 							>
-								🟦
+								🟩
 							</span>
 						) : game.name === "Connect Four" ? (
 							<span
@@ -158,6 +164,20 @@ export default function Dashboard() {
 								aria-label="hangman"
 							>
 								🪢
+							</span>
+						) : game.name === "Tetris" ? (
+							<span
+								className="flex flex-row gap-0 justify-center items-center mb-4"
+								role="img"
+								aria-label="tetris"
+								style={{
+									fontSize: "2.2rem",
+									letterSpacing: "-0.3rem",
+									width: "fit-content",
+									margin: "0 auto",
+								}}
+							>
+								🟦🟦🟦🟦
 							</span>
 						) : (
 							<img
