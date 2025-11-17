@@ -168,7 +168,161 @@ function getValidMoves(board: Board, from: [number, number], turnColor: "w" | "b
   }
   // TODO: Add castling, en passant, check/checkmate detection
   // Filter out any moves that are not [number, number] (should always be, but for safety)
-  return moves.filter((m): m is [number, number] => Array.isArray(m) && m.length === 2 && typeof m[0] === "number" && typeof m[1] === "number");
+  let rawMoves = moves.filter((m): m is [number, number] => Array.isArray(m) && m.length === 2 && typeof m[0] === "number" && typeof m[1] === "number");
+
+  // Filter out moves that leave own king in check
+  function findKing(board: Board, color: "w" | "b"): [number, number] | null {
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const piece = board[r][c];
+        if (piece && piece.type === "k" && piece.color === color) return [r, c];
+      }
+    }
+    return null;
+  }
+  function isKingInCheck(board: Board, color: "w" | "b"): boolean {
+    const kingPos = findKing(board, color);
+    if (!kingPos) return false;
+    const [kr, kc] = kingPos;
+    const opponent = color === "w" ? "b" : "w";
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const piece = board[r][c];
+        if (piece && piece.color === opponent) {
+          if (getValidMovesRaw(board, [r, c], opponent).some(([mr, mc]) => mr === kr && mc === kc)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+  // Helper to get raw moves (no king check filtering)
+  function getValidMovesRaw(board: Board, from: [number, number], turnColor: "w" | "b"): [number, number][] {
+    // ...copy the move generation logic from above, but do not filter for king in check...
+    // (for brevity, just call the original logic up to rawMoves)
+    // This is a simplified version for threat detection only
+    const [r, c] = from;
+    const piece = board[r][c];
+    if (!piece || piece.color !== turnColor) return [];
+    const moves: [number, number][] = [];
+    const directions = {
+      n: [
+        [
+          [r - 1, c - 2],
+          [r + 1, c - 2],
+          [r - 2, c - 1],
+          [r + 2, c - 1],
+          [r - 2, c + 1],
+          [r + 2, c + 1],
+          [r - 1, c + 2],
+          [r + 1, c + 2],
+        ],
+      ],
+      k: [
+        [
+          [r - 1, c - 1],
+          [r, c - 1],
+          [r + 1, c - 1],
+          [r - 1, c],
+          [r + 1, c],
+          [r - 1, c + 1],
+          [r, c + 1],
+          [r + 1, c + 1],
+        ],
+      ],
+      b: [
+        [
+          [-1, -1],
+          [1, -1],
+          [-1, 1],
+          [1, 1],
+        ],
+      ],
+      r: [
+        [
+          [0, -1],
+          [0, 1],
+          [-1, 0],
+          [1, 0],
+        ],
+      ],
+      q: [
+        [
+          [0, -1],
+          [0, 1],
+          [-1, 0],
+          [1, 0],
+          [-1, -1],
+          [1, -1],
+          [-1, 1],
+          [1, 1],
+        ],
+      ],
+    };
+    if (piece.type === "n") {
+      for (const [nr, nc] of directions.n[0]) {
+        if (
+          nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && (!board[nr][nc] || isOpponent(piece, board[nr][nc]))
+        ) {
+          moves.push([nr, nc]);
+        }
+      }
+    } else if (piece.type === "k") {
+      for (const [nr, nc] of directions.k[0]) {
+        if (
+          nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && (!board[nr][nc] || isOpponent(piece, board[nr][nc]))
+        ) {
+          moves.push([nr, nc]);
+        }
+      }
+    } else if (piece.type === "b" || piece.type === "r" || piece.type === "q") {
+      const dirs = directions[piece.type][0];
+      for (const [dr, dc] of dirs) {
+        let nr = r + dr, nc = c + dc;
+        while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+          if (!board[nr][nc]) {
+            moves.push([nr, nc]);
+          } else {
+            if (isOpponent(piece, board[nr][nc])) moves.push([nr, nc]);
+            break;
+          }
+          nr += dr;
+          nc += dc;
+        }
+      }
+    } else if (piece.type === "p") {
+      const dir = piece.color === "w" ? 1 : -1;
+      if (c + dir >= 0 && c + dir < 8 && !board[r][c + dir]) moves.push([r, c + dir]);
+      if (
+        (piece.color === "w" && c === 1) || (piece.color === "b" && c === 6)
+      ) {
+        if (
+          c + dir >= 0 && c + dir < 8 && !board[r][c + dir] &&
+          c + 2 * dir >= 0 && c + 2 * dir < 8 && !board[r][c + 2 * dir]
+        ) {
+          moves.push([r, c + 2 * dir]);
+        }
+      }
+      for (const dr of [-1, 1]) {
+        if (
+          r + dr >= 0 && r + dr < 8 && c + dir >= 0 && c + dir < 8 &&
+          board[r + dr][c + dir] &&
+          isOpponent(piece, board[r + dr][c + dir])
+        ) {
+          moves.push([r + dr, c + dir]);
+        }
+      }
+    }
+    return moves.filter((m): m is [number, number] => Array.isArray(m) && m.length === 2 && typeof m[0] === "number" && typeof m[1] === "number");
+  }
+  // Now filter out moves that leave king in check
+  return rawMoves.filter(([toR, toC]) => {
+    const newBoard = board.map(row => row.slice());
+    newBoard[toR][toC] = piece;
+    newBoard[r][c] = EMPTY;
+    return !isKingInCheck(newBoard, turnColor);
+  });
 }
 
 export default function Chess() {
@@ -178,8 +332,50 @@ export default function Chess() {
   const [validMoves, setValidMoves] = useState<[number, number][]>([]);
   const [capturedWhite, setCapturedWhite] = useState<PieceType[]>([]);
   const [capturedBlack, setCapturedBlack] = useState<PieceType[]>([]);
+  const [gameOver, setGameOver] = useState<null | { winner: string }>(null);
+
+  function findKing(board: Board, color: "w" | "b"): [number, number] | null {
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const piece = board[r][c];
+        if (piece && piece.type === "k" && piece.color === color) return [r, c];
+      }
+    }
+    return null;
+  }
+
+  function hasAnyValidMoves(board: Board, color: "w" | "b"): boolean {
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const piece = board[r][c];
+        if (piece && piece.color === color) {
+          if (getValidMoves(board, [r, c], color).length > 0) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function isKingInCheck(board: Board, color: "w" | "b"): boolean {
+    const kingPos = findKing(board, color);
+    if (!kingPos) return false;
+    const [kr, kc] = kingPos;
+    const opponent = color === "w" ? "b" : "w";
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const piece = board[r][c];
+        if (piece && piece.color === opponent) {
+          if (getValidMoves(board, [r, c], opponent).some(([mr, mc]) => mr === kr && mc === kc)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
 
   function handleCellClick(row: number, col: number) {
+    if (gameOver) return;
     if (selected) {
       const [fromRow, fromCol] = selected;
       const piece = board[fromRow][fromCol];
@@ -198,6 +394,32 @@ export default function Chess() {
         }
         newBoard[row][col] = piece;
         newBoard[fromRow][fromCol] = EMPTY;
+        // Check for king capture
+        const whiteKing = findKing(newBoard, "w");
+        const blackKing = findKing(newBoard, "b");
+        if (!whiteKing) {
+          setBoard(newBoard);
+          setGameOver({ winner: "Black" });
+          return;
+        }
+        if (!blackKing) {
+          setBoard(newBoard);
+          setGameOver({ winner: "White" });
+          return;
+        }
+        // Check for checkmate or stalemate after move
+        const nextColor = whiteTurn ? "b" : "w";
+        if (!hasAnyValidMoves(newBoard, nextColor)) {
+          if (isKingInCheck(newBoard, nextColor)) {
+            setBoard(newBoard);
+            setGameOver({ winner: whiteTurn ? "White" : "Black" });
+            return;
+          } else {
+            setBoard(newBoard);
+            setGameOver({ winner: "Draw" });
+            return;
+          }
+        }
         setBoard(newBoard);
         setWhiteTurn(!whiteTurn);
         setSelected(null);
@@ -222,7 +444,30 @@ export default function Chess() {
     setValidMoves([]);
     setCapturedWhite([]);
     setCapturedBlack([]);
+    setGameOver(null);
   }
+
+  // Check for checkmate/stalemate at the start of every turn or after restart
+  React.useEffect(() => {
+    if (gameOver) return;
+    const color = whiteTurn ? "w" : "b";
+    // Only check if both kings are present
+    if (!findKing(board, "w")) {
+      setGameOver({ winner: "Black" });
+      return;
+    }
+    if (!findKing(board, "b")) {
+      setGameOver({ winner: "White" });
+      return;
+    }
+    if (!hasAnyValidMoves(board, color)) {
+      if (isKingInCheck(board, color)) {
+        setGameOver({ winner: whiteTurn ? "Black" : "White" });
+      } else {
+        setGameOver({ winner: "Draw" });
+      }
+    }
+  }, [board, whiteTurn, gameOver]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-green-200 pt-12">
@@ -241,7 +486,13 @@ export default function Chess() {
       </button>
       <h1 className="text-4xl font-bold mb-4 text-green-700 drop-shadow-lg">Chess</h1>
       <div className="mb-4 text-lg font-semibold text-gray-700">
-        {whiteTurn ? "White's turn" : "Black's turn"}
+        {gameOver
+          ? gameOver.winner === "Draw"
+            ? "Stalemate! It's a draw."
+            : `${gameOver.winner} wins!`
+          : whiteTurn
+          ? "White's turn"
+          : "Black's turn"}
       </div>
       <div className="relative w-full flex justify-center items-start">
         {/* Captured pieces absolutely positioned on the left, always two horizontal rows if more than one */}
@@ -280,18 +531,19 @@ export default function Chess() {
           )}
         </div>
         <div className="relative z-20">
-          <div className="grid grid-cols-8 grid-rows-8 gap-0.5 bg-gray-700 p-2 rounded-2xl shadow-2xl border-4 border-green-400 aspect-square mx-auto" style={{ width: 420, height: 420 }}>
+          <div className="grid grid-cols-8 grid-rows-8 gap-0.5 bg-gray-700 p-2 rounded-2xl shadow-2xl border-4 border-green-400 aspect-square mx-auto" style={{ width: 420, height: 410 }}>
             {Array.from({ length: 8 }).map((_, cIdx) =>
               Array.from({ length: 8 }).map((_, rIdx) => {
                 const cell = board[rIdx][cIdx];
                 const isSelected = selected && selected[0] === rIdx && selected[1] === cIdx;
                 const isValid = validMoves.some(([mr, mc]) => mr === rIdx && mc === cIdx);
+                const showHighlight = !gameOver;
                 return (
                   <div
                     key={`${rIdx}-${cIdx}`}
                     className={`flex items-center justify-center text-2xl sm:text-3xl font-bold select-none border border-gray-500 cursor-pointer transition-all duration-150 aspect-square w-full h-full
-                      ${isSelected ? "bg-yellow-300" : isValid ? "bg-green-200" : (rIdx + cIdx) % 2 === 0 ? "bg-green-100" : "bg-white"}
-                      ${isValid ? "ring-2 ring-green-500" : ""}
+                      ${showHighlight && isSelected ? "bg-yellow-300" : showHighlight && isValid ? "bg-green-200" : (rIdx + cIdx) % 2 === 0 ? "bg-green-100" : "bg-white"}
+                      ${showHighlight && isValid ? "ring-2 ring-green-500" : ""}
                     `}
                     onClick={() => handleCellClick(rIdx, cIdx)}
                   >
