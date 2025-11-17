@@ -108,9 +108,10 @@ function clearLines(board: number[][]) {
 }
 
 export default function Tetris() {
+  // State initialization (do not use Math.random() directly)
   const [board, setBoard] = useState<number[][]>(Array.from({ length: ROWS }, () => Array(COLS).fill(0)));
-  const [piece, setPiece] = useState(randomPiece());
-  const [next, setNext] = useState(randomPiece());
+  const [piece, setPiece] = useState<any>(null);
+  const [next, setNext] = useState<any>(null);
   const [score, setScore] = useState(0);
   const [lines, setLines] = useState(0);
   const [level, setLevel] = useState(1);
@@ -120,6 +121,17 @@ export default function Tetris() {
   const requestRef = useRef<number | null>(null);
   const lastDrop = useRef(Date.now());
 
+  // Initialize random pieces only on client
+  useEffect(() => {
+    if (piece === null && next === null) {
+      const first = randomPiece();
+      const second = randomPiece();
+      setPiece(first);
+      setNext(second);
+    }
+    // eslint-disable-next-line
+  }, []);
+
   // Handle keyboard
   useEffect(() => {
     if (!started || gameOver) return;
@@ -128,19 +140,19 @@ export default function Tetris() {
       if (["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", " ", "Space"].includes(e.key)) e.preventDefault();
       let { row, col, shape, type } = piece;
       if (e.key === "ArrowLeft") {
-        if (!checkCollision(board, shape, row, col - 1)) setPiece(p => ({ ...p, col: p.col - 1 }));
+        if (!checkCollision(board, shape, row, col - 1)) setPiece((p: typeof piece) => ({ ...p, col: p.col - 1 }));
       } else if (e.key === "ArrowRight") {
-        if (!checkCollision(board, shape, row, col + 1)) setPiece(p => ({ ...p, col: p.col + 1 }));
+        if (!checkCollision(board, shape, row, col + 1)) setPiece((p: typeof piece) => ({ ...p, col: p.col + 1 }));
       } else if (e.key === "ArrowDown") {
-        if (!checkCollision(board, shape, row + 1, col)) setPiece(p => ({ ...p, row: p.row + 1 }));
+        if (!checkCollision(board, shape, row + 1, col)) setPiece((p: typeof piece) => ({ ...p, row: p.row + 1 }));
       } else if (e.key === "ArrowUp") {
         const rotated = rotate(shape);
-        if (!checkCollision(board, rotated, row, col)) setPiece(p => ({ ...p, shape: rotated }));
+        if (!checkCollision(board, rotated, row, col)) setPiece((p: typeof piece) => ({ ...p, shape: rotated }));
       } else if (e.key === " " || e.key === "Space") {
         // Hard drop
         let dropRow = row;
         while (!checkCollision(board, shape, dropRow + 1, col)) dropRow++;
-        setPiece(p => ({ ...p, row: dropRow }));
+        setPiece((p: typeof piece) => ({ ...p, row: dropRow }));
       }
     }
     window.addEventListener("keydown", handle);
@@ -154,7 +166,7 @@ export default function Tetris() {
       if (Date.now() - lastDrop.current > dropTime) {
         let { row, col, shape, type } = piece;
         if (!checkCollision(board, shape, row + 1, col)) {
-          setPiece(p => ({ ...p, row: p.row + 1 }));
+          setPiece((p: typeof piece) => ({ ...p, row: p.row + 1 }));
         } else {
           // Place piece
           const newBoard = placePiece(board, shape, row, col, type);
@@ -184,8 +196,10 @@ export default function Tetris() {
 
   function startGame() {
     setBoard(Array.from({ length: ROWS }, () => Array(COLS).fill(0)));
-    setPiece(randomPiece());
-    setNext(randomPiece());
+    const first = randomPiece();
+    const second = randomPiece();
+    setPiece(first);
+    setNext(second);
     setScore(0);
     setLines(0);
     setLevel(1);
@@ -198,8 +212,12 @@ export default function Tetris() {
   }
 
   // Render board with current piece
-  const display = board.map((row, r) =>
-    row.map((cell, c) => {
+  if (!piece || !next) {
+    return <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 to-blue-100">Loading...</div>;
+  }
+
+  const display = board.map((row: number[], r: number) =>
+    row.map((cell: number, c: number) => {
       let val = cell;
       // Overlay current piece
       if (!gameOver) {
@@ -224,33 +242,58 @@ export default function Tetris() {
     })
   );
 
+  // Render next piece in a 4x4 grid, centered
+  const PREVIEW_SIZE = 4;
+  const previewGrid = Array.from({ length: PREVIEW_SIZE }, (_, r) =>
+    Array.from({ length: PREVIEW_SIZE }, (_, c) => 0)
+  );
+  // Place the next.shape in the previewGrid, centered
+  if (next && next.shape) {
+    const shapeRows = next.shape.length;
+    const shapeCols = next.shape[0].length;
+    const rowOffset = Math.floor((PREVIEW_SIZE - shapeRows) / 2);
+    const colOffset = Math.floor((PREVIEW_SIZE - shapeCols) / 2);
+    for (let r = 0; r < shapeRows; r++) {
+      for (let c = 0; c < shapeCols; c++) {
+        if (next.shape[r][c]) {
+          previewGrid[rowOffset + r][colOffset + c] = next.type;
+        }
+      }
+    }
+  }
+
   const nextPreview = (
     <div
       className="grid"
       style={{
-        gridTemplateRows: `repeat(${next.shape.length}, ${BLOCK_SIZE}px)`,
-        gridTemplateColumns: `repeat(${next.shape[0].length}, ${BLOCK_SIZE}px)`,
+        gridTemplateRows: `repeat(${PREVIEW_SIZE}, ${BLOCK_SIZE}px)`,
+        gridTemplateColumns: `repeat(${PREVIEW_SIZE}, ${BLOCK_SIZE}px)`,
         gap: "1px",
         backgroundColor: "#e0e7ff",
         borderRadius: "0.375rem",
         overflow: "hidden",
       }}
     >
-      {next.shape.flatMap((row, r) =>
-        row.map((value, c) =>
+      {previewGrid.flatMap((row: number[], r: number) =>
+        row.map((value: number, c: number) =>
           value ? (
             <div
               key={`next-${r}-${c}`}
-              className={`w-${BLOCK_SIZE} h-${BLOCK_SIZE} ${COLORS[next.type]}`}
+              className={`w-[${BLOCK_SIZE}px] h-[${BLOCK_SIZE}px] ${COLORS[value]} rounded-sm border border-black/30`}
             />
-          ) : null
+          ) : (
+            <div
+              key={`next-${r}-${c}`}
+              className={`w-[${BLOCK_SIZE}px] h-[${BLOCK_SIZE}px] bg-transparent`}
+            />
+          )
         )
       )}
     </div>
   );
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 pt-12 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-blue-100 pt-12 relative">
       <button
         className="absolute top-6 left-8 px-6 py-3 bg-green-500 text-white rounded shadow hover:bg-green-600 text-lg font-bold transition z-10"
         onClick={startGame}
@@ -277,7 +320,7 @@ export default function Tetris() {
       <div className="flex flex-col md:flex-row gap-8 items-start justify-center w-full max-w-4xl">
         <div className="flex flex-col items-center">
           <div
-            className="grid"
+            className="grid relative"
             style={{
               gridTemplateRows: `repeat(${ROWS}, ${BLOCK_SIZE}px)`,
               gridTemplateColumns: `repeat(${COLS}, ${BLOCK_SIZE}px)`,
@@ -290,10 +333,12 @@ export default function Tetris() {
             }}
           >
             {display.flat()}
+            {gameOver && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-20">
+                <div className="text-4xl md:text-5xl font-extrabold text-red-600 drop-shadow-lg bg-white/80 rounded-xl px-8 py-6 border-2 border-red-300">Game Over</div>
+              </div>
+            )}
           </div>
-          {gameOver && (
-            <div className="mt-6 text-2xl font-bold text-red-600">Game Over</div>
-          )}
         </div>
         {/* Info panel removed from here, now absolutely positioned above */}
       </div>
