@@ -68,7 +68,7 @@ export default function SlidingPuzzleNumbers() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-200">
       <button className="absolute top-6 right-6 px-6 py-3 bg-gray-400 text-white rounded shadow hover:bg-gray-500 text-lg font-bold transition z-20" onClick={() => window.location.href = '/sliding-puzzle/select-mode'}>Back to Selection</button>
-      <div className="absolute top-20 right-6 z-20 w-48 flex justify-center">
+      <div className="absolute top-20 right-6 z-20">
         <div className="bg-white/80 rounded-lg px-4 py-2 shadow text-blue-700 font-bold text-lg">Timer: {seconds}s</div>
       </div>
       <h1 className="text-4xl font-bold mb-4 text-blue-700 drop-shadow-lg">Sliding Puzzle - Numbers</h1>
@@ -86,6 +86,11 @@ export default function SlidingPuzzleNumbers() {
             </div>
           )
         ))}
+        {won && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-xl z-20">
+            <div className="text-3xl md:text-4xl font-extrabold text-green-300 drop-shadow-lg bg-white/90 rounded-xl px-8 py-6 border-2 border-green-400 shadow-xl">🎉 You solved it!</div>
+          </div>
+        )}
       </div>
       <button className="px-4 py-2 bg-purple-500 text-white rounded shadow hover:bg-purple-600 transition" onClick={handleRestart}>Restart</button>
       <div style={{ minHeight: 28 }} className="flex items-center justify-center w-full">
